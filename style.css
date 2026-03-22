@@ -1,0 +1,124 @@
+/* style.css - Stiluri de bază și teme */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+}
+
+body.dark {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --text-primary: #eaeaea;
+    --text-secondary: #b0b0b0;
+    --border-color: #444;
+    --primary-color: #4dabf7;
+    --success-color: #51cf66;
+    --danger-color: #ff6b6b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    padding: 20px;
+    transition: background 0.3s, color 0.3s;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--bg-secondary);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Navigare */
+nav {
+    background: var(--primary-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: 500;
+}
+nav a:hover { text-decoration: underline; }
+
+/* Formulare */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 500px;
+}
+label { font-weight: 600; margin-bottom: 5px; }
+input, select, textarea {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+button, .btn {
+    padding: 10px 20px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.2s;
+}
+button:hover, .btn:hover { opacity: 0.9; }
+.btn-danger { background: var(--danger-color); }
+.btn-success { background: var(--success-color); }
+
+/* Tabele */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+th { background: var(--primary-color); color: white; }
+tr:hover { background: rgba(0,0,0,0.05); }
+
+/* Alert messages */
+.alert {
+    padding: 12px 20px;
+    border-radius: 5px;
+    margin: 15px 0;
+}
+.alert-success { background: rgba(25,135,84,0.2); color: var(--success-color); border: 1px solid var(--success-color); }
+.alert-error { background: rgba(220,53,69,0.2); color: var(--danger-color); border: 1px solid var(--danger-color); }
+
+/* Utilitare */
+.section { margin: 25px 0; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; }
+.section h3 { margin-bottom: 15px; color: var(--primary-color); }
+.flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.text-center { text-align: center; }
+.mt-2 { margin-top: 20px; }
+
+/* Tema dark - elemente specifice */
+body.dark table tr:hover { background: rgba(255,255,255,0.05); }
+body.dark input:focus, body.dark select:focus {
+    outline: 2px solid var(--primary-color);
+    border-color: transparent;
+}

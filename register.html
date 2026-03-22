@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Înregistrare - Laborator 3</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+    <div class="container" style="max-width:450px;">
+        <nav>
+            <a href="index.html">🏠 Acasă</a>
+            <a href="login.html">🔐 Login</a>
+        </nav>
+
+        <h1 class="text-center">📝 Creare Cont Nou</h1>
+        
+        <form id="registerForm">
+            <label for="username">Username (min. 3 caractere):</label>
+            <input type="text" id="username" required minlength="3">
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <label for="password">Parolă (min. 6 caractere):</label>
+            <input type="password" id="password" required minlength="6">
+
+            <label for="confirmPassword">Confirmă Parola:</label>
+            <input type="password" id="confirmPassword" required>
+
+            <button type="submit" class="btn btn-success">✨ Creează Cont</button>
+        </form>
+
+        <p class="text-center mt-2">
+            Ai deja cont? <a href="login.html">Autentifică-te</a>
+        </p>
+
+        <div id="message"></div>
+    </div>
+
+    <script src="js/cookies.js"></script>
+    <script src="js/storage.js"></script>
+    <script>
+        document.body.className = CookieManager.get('theme') || 'light';
+
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = document.getElementById('message');
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validări
+            if (password !== confirmPassword) {
+                message.innerHTML = '<div class="alert alert-error">❌ Parolele nu coincid!</div>';
+                return;
+            }
+
+            const users = StorageManager.getLocal('users') || [];
+            
+            if (users.find(u => u.username === username)) {
+                message.innerHTML = '<div class="alert alert-error">❌ Username deja existent!</div>';
+                return;
+            }
+            if (users.find(u => u.email === email)) {
+                message.innerHTML = '<div class="alert alert-error">❌ Email deja înregistrat!</div>';
+                return;
+            }
+
+            // Creează utilizator nou
+            const newUser = {
+                id: Date.now(),
+                username,
+                email,
+                password // ⚠️ În producție, parolele se hash-uiesc!
+            };
+            
+            users.push(newUser);
+            StorageManager.setLocal('users', users);
+
+            message.innerHTML = '<div class="alert alert-success">✅ Cont creat! Redirecționare către login...</div>';
+            
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

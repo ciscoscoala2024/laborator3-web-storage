@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laborator 3 - Acasă</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+    <div class="container">
+        <!-- Navigare -->
+        <nav>
+            <a href="index.html">🏠 Acasă</a>
+            <a href="preferences.html">⚙️ Preferințe</a>
+            <a href="cookies-info.html">🍪 Cookies Info</a>
+            <a href="login.html">🔐 Login</a>
+        </nav>
+
+        <!-- Mesaj bun venit -->
+        <h1 id="welcomeMsg">Bun venit, Vizitator! 👋</h1>
+        <p>Vizita numărul: <strong id="visitCount">?</strong></p>
+        
+        <!-- Tabele de date -->
+        <div class="section">
+            <h3>🍪 Cookies Active</h3>
+            <table id="cookiesTable">
+                <thead><tr><th>Nume</th><th>Valoare</th><th>Lungime</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>💾 localStorage</h3>
+            <table id="localTable">
+                <thead><tr><th>Cheie</th><th>Valoare</th><th>Tip</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>🔄 sessionStorage</h3>
+            <table id="sessionTable">
+                <thead><tr><th>Cheie</th><th>Valoare</th><th>Tip</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Buton șterge tot -->
+        <div class="text-center mt-2">
+            <button class="btn btn-danger" onclick="clearAll()">🗑️ Șterge Tot</button>
+        </div>
+    </div>
+
+    <!-- Scripturi -->
+    <script src="js/cookies.js"></script>
+    <script src="js/storage.js"></script>
+    <script>
+        // === 1. Aplică tema salvată ===
+        const savedTheme = CookieManager.get('theme') || 'light';
+        document.body.className = savedTheme;
+
+        // === 2. Mesaj bun venit + contor vizite ===
+        const username = CookieManager.get('username') || 'Vizitator';
+        document.getElementById('welcomeMsg').textContent = `Bun venit, ${username}! `;
+
+        let visits = parseInt(CookieManager.get('visits')) || 0;
+        visits++;
+        CookieManager.set('visits', visits, 365);
+        document.getElementById('visitCount').textContent = visits;
+
+        // === 3. Populează tabelele ===
+        function populateTable(tableId, data, isCookie = false) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+            
+            Object.entries(data).forEach(([key, value]) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = key;
+                
+                const valCell = row.insertCell(1);
+                if (typeof value === 'object') {
+                    valCell.textContent = JSON.stringify(value).substring(0, 50) + '...';
+                } else {
+                    valCell.textContent = value;
+                }
+                
+                const typeCell = row.insertCell(2);
+                if (isCookie) {
+                    typeCell.textContent = value.length + ' chars';
+                } else {
+                    typeCell.textContent = typeof value;
+                }
+            });
+            
+            if (Object.keys(data).length === 0) {
+                const row = tbody.insertRow();
+                row.insertCell(0).colSpan = 3;
+                row.cells[0].textContent = 'Nicio dată salvată';
+                row.cells[0].style.textAlign = 'center';
+            }
+        }
+
+        populateTable('cookiesTable', CookieManager.getAll(), true);
+        populateTable('localTable', StorageManager.getAllLocal());
+        populateTable('sessionTable', StorageManager.getAllSession());
+
+        // === 4. Funcție șterge tot ===
+        function clearAll() {
+            if (confirm('Ești sigur că vrei să ștergi TOATE datele?')) {
+                CookieManager.deleteAll();
+                StorageManager.clearLocal();
+                StorageManager.clearSession();
+                alert('✅ Toate datele au fost șterse!');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

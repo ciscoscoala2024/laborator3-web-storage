@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookies Info - Laborator 3</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+    <div class="container">
+        <nav>
+            <a href="index.html">🏠 Acasă</a>
+            <a href="preferences.html">⚙️ Preferințe</a>
+            <a href="cookies-info.html">🍪 Cookies Info</a>
+            <a href="login.html">🔐 Login</a>
+        </nav>
+
+        <h1>🍪 Informații Stocare</h1>
+
+        <!-- Cookies brut -->
+        <div class="section">
+            <h3>📜 document.cookie (raw)</h3>
+            <pre id="rawCookies" style="background:var(--bg-primary);padding:10px;border-radius:5px;overflow-x:auto;"></pre>
+        </div>
+
+        <!-- Tabel Cookies -->
+        <div class="section">
+            <h3>🍪 Cookies Detaliate</h3>
+            <table id="cookiesTable">
+                <thead><tr><th>Nume</th><th>Valoare</th><th>Lungime</th><th>Acțiune</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- localStorage -->
+        <div class="section">
+            <h3>💾 localStorage</h3>
+            <pre id="localJSON" style="background:var(--bg-primary);padding:10px;border-radius:5px;overflow-x:auto;font-size:12px;"></pre>
+            <table id="localTable">
+                <thead><tr><th>Cheie</th><th>Valoare</th><th>Dimensiune</th><th>Acțiune</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- sessionStorage -->
+        <div class="section">
+            <h3>🔄 sessionStorage</h3>
+            <pre id="sessionJSON" style="background:var(--bg-primary);padding:10px;border-radius:5px;overflow-x:auto;font-size:12px;"></pre>
+            <table id="sessionTable">
+                <thead><tr><th>Cheie</th><th>Valoare</th><th>Dimensiune</th><th>Acțiune</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Tabel comparativ -->
+        <div class="section">
+            <h3>📊 Comparație Tehnologii</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Caracteristică</th>
+                        <th>🍪 Cookies</th>
+                        <th>💾 localStorage</th>
+                        <th>🔄 sessionStorage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Capacitate</strong></td>
+                        <td>~4KB</td>
+                        <td>~5-10MB</td>
+                        <td>~5-10MB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Expirare</strong></td>
+                        <td>Setabilă manual</td>
+                        <td>Niciodată (până la ștergere)</td>
+                        <td>La închiderea tab-ului</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trimis la server?</strong></td>
+                        <td>✅ Da, automat</td>
+                        <td>❌ Nu</td>
+                        <td>❌ Nu</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Accesibil din</strong></td>
+                        <td>JS + Server</td>
+                        <td>Doar JS (client)</td>
+                        <td>Doar JS (client, același tab)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/cookies.js"></script>
+    <script src="js/storage.js"></script>
+    <script>
+        // Aplică tema
+        document.body.className = CookieManager.get('theme') || 'light';
+
+        // Afișează raw cookies
+        document.getElementById('rawCookies').textContent = document.cookie || '(niciun cookie)';
+
+        // Funcție helper pentru populare tabele
+        function populateStorageTable(tableId, data, storageType) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+            
+            Object.entries(data).forEach(([key, value]) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = key;
+                row.insertCell(1).textContent = typeof value === 'object' ? JSON.stringify(value) : value;
+                row.insertCell(2).textContent = JSON.stringify(value).length + ' bytes';
+                
+                const actionCell = row.insertCell(3);
+                const btn = document.createElement('button');
+                btn.textContent = '🗑️';
+                btn.className = 'btn-danger';
+                btn.style.padding = '5px 10px';
+                btn.onclick = () => {
+                    if (storageType === 'cookie') {
+                        CookieManager.delete(key);
+                    } else if (storageType === 'local') {
+                        StorageManager.removeLocal(key);
+                    } else {
+                        StorageManager.removeSession(key);
+                    }
+                    location.reload();
+                };
+                actionCell.appendChild(btn);
+            });
+            
+            if (Object.keys(data).length === 0) {
+                const row = tbody.insertRow();
+                row.insertCell(0).colSpan = 4;
+                row.cells[0].textContent = 'Nicio dată';
+                row.cells[0].style.textAlign = 'center';
+            }
+        }
+
+        // Populează toate tabelele
+        const cookies = CookieManager.getAll();
+        populateStorageTable('cookiesTable', cookies, 'cookie');
+        
+        const local = StorageManager.getAllLocal();
+        document.getElementById('localJSON').textContent = JSON.stringify(local, null, 2);
+        populateStorageTable('localTable', local, 'local');
+        
+        const session = StorageManager.getAllSession();
+        document.getElementById('sessionJSON').textContent = JSON.stringify(session, null, 2);
+        populateStorageTable('sessionTable', session, 'session');
+    </script>
+</body>
+</html>

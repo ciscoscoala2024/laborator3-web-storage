@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Laborator 3</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+    <div class="container">
+        <nav>
+            <a href="index.html">🏠 Acasă</a>
+            <a href="cart.html">🛒 Coș</a>
+            <button onclick="logout()" class="btn btn-danger" style="float:right;padding:5px 15px;">🚪 Deconectare</button>
+        </nav>
+
+        <h1>👋 Bun venit, <span id="username">...</span>!</h1>
+
+        <div class="section">
+            <h3>🔐 Informații Sesiune</h3>
+            <table>
+                <tr><td><strong>ID Sesiune:</strong></td><td id="sessionId">...</td></tr>
+                <tr><td><strong>Username:</strong></td><td id="sessUsername">...</td></tr>
+                <tr><td><strong>Email:</strong></td><td id="email">...</td></tr>
+                <tr><td><strong>Autentificat la:</strong></td><td id="loginTime">...</td></tr>
+                <tr><td><strong>Durată sesiune:</strong></td><td id="duration">00:00:00</td></tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>🔍 Debug - sessionStorage (raw)</h3>
+            <pre id="sessionDebug" style="background:var(--bg-primary);padding:10px;border-radius:5px;overflow-x:auto;font-size:11px;"></pre>
+        </div>
+
+        <div class="flex-row">
+            <a href="cart.html" class="btn btn-success">🛒 Mergi la Coș</a>
+            <a href="index.html" target="_blank" class="btn">🔗 Deschide index.html în tab nou (test sessionStorage)</a>
+        </div>
+    </div>
+
+    <script src="js/cookies.js"></script>
+    <script src="js/storage.js"></script>
+    <script>
+        document.body.className = CookieManager.get('theme') || 'light';
+
+        // === Verificare autentificare ===
+        const session = StorageManager.getSession('session');
+        if (!session) {
+            window.location.href = 'login.html';
+        }
+
+        // === Afișează date sesiune ===
+        document.getElementById('username').textContent = session.username;
+        document.getElementById('sessionId').textContent = session.sessionId;
+        document.getElementById('sessUsername').textContent = session.username;
+        document.getElementById('email').textContent = session.email;
+        document.getElementById('loginTime').textContent = new Date(session.loginTime).toLocaleString('ro-RO');
+        document.getElementById('sessionDebug').textContent = JSON.stringify(session, null, 2);
+
+        // === Timer durată sesiune ===
+        const loginDate = new Date(session.loginTime);
+        function updateDuration() {
+            const now = new Date();
+            const diff = now - loginDate;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            document.getElementById('duration').textContent = 
+                `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        }
+        setInterval(updateDuration, 1000);
+        updateDuration();
+
+        // === Logout ===
+        function logout() {
+            StorageManager.removeSession('session');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
